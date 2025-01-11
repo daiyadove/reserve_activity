@@ -1,0 +1,182 @@
+[
+  {
+    "id": "FUN-001",
+    "category": "予約表示",
+    "function_name": "空き枠一覧取得",
+    "description": "日付と時間でグループ化された枠の一覧を取得し、各枠の開始時間、終了時間、空き人数、売止情報を表示する。",
+    "input": "日付",
+    "output": "枠情報リスト",
+    "user": "顧客"
+  },
+  {
+    "id": "FUN-002",
+    "category": "予約表示",
+    "function_name": "売止枠表示",
+    "description": "売止に設定された枠は、満席または受付終了と表示する。",
+    "input": "枠情報",
+    "output": "表示情報",
+    "user": "顧客"
+  },
+  {
+    "id": "FUN-003",
+    "category": "予約登録",
+    "function_name": "予約情報入力フォーム表示",
+    "description": "選択した枠の情報を基に、氏名、メールアドレス、電話番号、人数、オプション(メニュー選択)を入力するフォームを表示する。",
+    "input": "選択された枠情報",
+    "output": "予約登録フォーム",
+    "user": "顧客"
+  },
+  {
+    "id": "FUN-004",
+    "category": "予約登録",
+    "function_name": "予約情報バリデーション",
+    "description": "入力された予約情報の必須項目チェック、形式チェックなどを行う。",
+    "input": "予約情報",
+    "output": "バリデーション結果",
+    "user": "顧客"
+  },
+  {
+    "id": "FUN-005",
+    "category": "予約登録",
+    "function_name": "予約登録処理",
+    "description": "入力された予約情報をデータベースに登録する。",
+    "input": "予約情報",
+    "output": "予約完了",
+    "user": "顧客"
+  },
+  {
+    "id": "FUN-006",
+    "category": "予約登録",
+    "function_name": "予約完了画面表示",
+    "description": "予約完了メッセージと予約内容（日時、人数、氏名、連絡先）を表示する。必要に応じて予約番号も表示する。",
+    "input": "予約情報",
+    "output": "予約完了画面",
+    "user": "顧客"
+  },
+  {
+    "id": "FUN-007",
+    "category": "予約管理",
+    "function_name": "予約一覧取得",
+    "description": "全ての予約情報をデータベースから取得し、一覧で表示する。",
+    "input": "なし",
+    "output": "予約情報リスト",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-008",
+    "category": "予約管理",
+    "function_name": "予約詳細表示",
+    "description": "選択された予約の詳細情報（氏名、連絡先、人数、予約日時、枠情報）を表示する。",
+    "input": "予約ID",
+    "output": "予約詳細情報",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-009",
+    "category": "予約管理",
+    "function_name": "予約検索",
+    "description": "予約情報を検索・絞り込む機能を提供する。検索条件：日時、氏名、メールアドレスなど。",
+    "input": "検索条件",
+    "output": "予約情報リスト",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-010",
+    "category": "予約管理",
+    "function_name": "予約キャンセル",
+    "description": "予約をキャンセルし、データベースから予約情報を削除する。",
+    "input": "予約ID",
+    "output": "予約キャンセル完了",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-011",
+    "category": "枠設定",
+    "function_name": "枠作成フォーム表示",
+    "description": "新しい枠を作成するためのフォームを表示する。開始日時、終了日時、上限人数を設定できる。",
+    "input": "なし",
+    "output": "枠作成フォーム",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-012",
+    "category": "枠設定",
+    "function_name": "枠作成処理",
+    "description": "入力された枠情報をデータベースに登録する。",
+    "input": "枠情報",
+    "output": "枠作成完了",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-013",
+    "category": "枠設定",
+    "function_name": "枠編集フォーム表示",
+    "description": "選択された枠を編集するためのフォームを表示する。日時、上限人数を編集できる。",
+    "input": "枠ID",
+    "output": "枠編集フォーム",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-014",
+    "category": "枠設定",
+    "function_name": "枠編集処理",
+    "description": "編集された枠情報をデータベースに更新する。",
+    "input": "枠情報",
+    "output": "枠編集完了",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-015",
+    "category": "枠設定",
+    "function_name": "枠削除処理",
+    "description": "予約のない枠を削除する。予約がある場合は削除不可。",
+    "input": "枠ID",
+    "output": "枠削除完了",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-016",
+    "category": "売止設定",
+    "function_name": "売止設定画面表示",
+    "description": "売止設定を行うための画面を表示する。",
+    "input": "なし",
+    "output": "売止設定画面",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-017",
+    "category": "売止設定",
+    "function_name": "売止設定処理",
+    "description": "選択された枠を売止状態にする。売止は特定の日付×枠の組み合わせで設定可能。例）xx月xx日のx時の枠を売止設定にする",
+    "input": "枠ID",
+    "output": "売止設定完了",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-018",
+    "category": "売止設定",
+    "function_name": "売止解除処理",
+    "description": "売止状態の枠の販売を再開する。",
+    "input": "枠ID",
+    "output": "売止解除完了",
+    "user": "管理者"
+  },
+  {
+    "id": "FUN-019",
+    "category": "その他",
+    "function_name": "エラーハンドリング",
+    "description": "システム内で発生したエラーを適切に処理し、ユーザーに分かりやすいメッセージを表示する。",
+    "input": "エラー情報",
+    "output": "エラーメッセージ",
+    "user": "顧客/管理者"
+  },
+  {
+    "id": "FUN-020",
+    "category": "その他",
+    "function_name": "ログ出力",
+    "description": "システムの操作ログを出力する。",
+    "input": "操作情報",
+    "output": "ログ情報",
+    "user": "管理者"
+  }
+]

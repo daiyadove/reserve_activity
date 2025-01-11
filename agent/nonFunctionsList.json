@@ -1,0 +1,56 @@
+[
+  {
+    "id": "NON-001",
+    "category": "可用性",
+    "non_function_name": "システム稼働時間",
+    "description": "システムは24時間365日稼働し、メンテナンス時間は事前に告知する。"
+  },
+  {
+    "id": "NON-002",
+    "category": "性能",
+    "non_function_name": "レスポンスタイム",
+    "description": "Webページの表示、予約登録、管理画面の操作は3秒以内に完了する。"
+  },
+  {
+    "id": "NON-003",
+    "category": "セキュリティ",
+    "non_function_name": "データ保護",
+    "description": "顧客の個人情報は暗号化して保存し、不正アクセスから保護する。"
+  },
+  {
+    "id": "NON-004",
+    "category": "ユーザビリティ",
+    "non_function_name": "操作性",
+    "description": "ユーザーインターフェースは直感的で使いやすく、予約登録から管理までスムーズに行える。"
+  },
+  {
+    "id": "NON-005",
+    "category": "保守性",
+    "non_function_name": "ログ機能",
+    "description": "システムのエラーや操作履歴を記録し、問題発生時の原因特定を容易にする。"
+  },
+  {
+    "id": "NON-006",
+    "category": "拡張性",
+    "non_function_name": "機能拡張",
+    "description": "将来的にメニュー機能や決済機能など、追加の機能拡張が容易にできるように設計する。"
+  },
+  {
+    "id": "NON-007",
+    "category": "互換性",
+    "non_function_name": "ブラウザ対応",
+    "description": "主要なWebブラウザ（Chrome, Firefox, Safari, Edge）で正常に動作する。"
+  },
+  {
+    "id": "NON-008",
+    "category": "信頼性",
+    "non_function_name": "データ整合性",
+    "description": "予約データは正確に保存され、データの不整合が発生しないようにする。"
+  },
+  {
+    "id": "NON-009",
+    "category": "性能",
+    "non_function_name": "同時アクセス",
+    "description": "同時に100ユーザーが利用しても、システムが正常に動作する。"
+  }
+]

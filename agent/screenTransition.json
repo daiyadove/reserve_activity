@@ -1,0 +1,26 @@
+[
+  {
+    "id": "予約表示",
+    "value": "{\n    \"mermaid\": \"graph LR\\n    TOP[トップ画面] --> Calendar[カレンダー画面]\\n    Calendar --> TimeSlotList[空き枠一覧画面]\\n    TimeSlotList --> SoldOutSlot[売止済み枠表示]\\n    TimeSlotList --> AvailableSlot[予約可能枠表示]\\n    style SoldOutSlot fill:#ffcccc\\n    style AvailableSlot fill:#ccffcc\\n    style TimeSlotList fill:#f9f9f9\\n    style Calendar fill:#f9f9f9\\n    style TOP fill:#f9f9f9\"\n}"
+  },
+  {
+    "id": "予約登録",
+    "value": "{\n  \"mermaid\": \"graph LR\\n    TOP[トップ画面] --> Calendar[予約カレンダー画面]\\n    Calendar --> TimeSlot[予約枠選択画面]\\n    TimeSlot --> ReservationForm[予約情報入力画面]\\n    ReservationForm --> ValidationError[入力エラー画面]\\n    ValidationError --> ReservationForm\\n    ReservationForm --> Confirm[予約内容確認画面]\\n    Confirm --> Complete[予約完了画面]\\n    Confirm --> ReservationForm\\n    Complete --> TOP\"\n}"
+  },
+  {
+    "id": "予約管理",
+    "value": "{\n    \"mermaid\": \"graph LR\\n    Login[管理者ログイン画面] --> List[予約一覧画面]\\n    List --> Search[予約検索画面]\\n    Search --> List\\n    List --> Detail[予約詳細画面]\\n    Detail --> Cancel[予約キャンセル確認画面]\\n    Cancel --> Complete[キャンセル完了画面]\\n    Complete --> List\\n    Detail --> List\\n    style Login fill:#f9f,stroke:#333\\n    style List fill:#bbf,stroke:#333\\n    style Search fill:#bbf,stroke:#333\\n    style Detail fill:#bbf,stroke:#333\\n    style Cancel fill:#bbf,stroke:#333\\n    style Complete fill:#bbf,stroke:#333\"\n}"
+  },
+  {
+    "id": "枠設定",
+    "value": "{\n  \"mermaid\": \"graph LR\\n    Login[管理者ログイン] --> AdminTop[管理画面TOP]\\n    AdminTop --> FrameList[枠一覧画面]\\n    FrameList --> CreateFrame[枠作成画面]\\n    FrameList --> EditFrame[枠編集画面]\\n    FrameList --> DeleteConfirm[枠削除確認画面]\\n    CreateFrame --> CreateConfirm[枠作成確認画面]\\n    CreateConfirm --> CreateComplete[枠作成完了画面]\\n    CreateComplete --> FrameList\\n    EditFrame --> EditConfirm[枠編集確認画面]\\n    EditConfirm --> EditComplete[枠編集完了画面]\\n    EditComplete --> FrameList\\n    DeleteConfirm --> DeleteComplete[枠削除完了画面]\\n    DeleteComplete --> FrameList\"\n}"
+  },
+  {
+    "id": "売止設定",
+    "value": "{\n    \"mermaid\": \"graph LR\\n    Login[管理者ログイン画面] --> AdminMenu[管理者メニュー]\\n    AdminMenu --> StopSaleList[売止設定一覧画面]\\n    StopSaleList --> StopSaleForm[売止設定フォーム画面]\\n    StopSaleForm --> StopSaleConfirm[売止設定確認画面]\\n    StopSaleConfirm --> StopSaleComplete[売止設定完了画面]\\n    StopSaleConfirm --> StopSaleList\\n    StopSaleList --> StopSaleCancel[売止解除確認画面]\\n    StopSaleCancel --> StopSaleCancelComplete[売止解除完了画面]\\n    StopSaleCancelComplete --> StopSaleList\\n    StopSaleComplete --> StopSaleList\"\n}"
+  },
+  {
+    "id": "その他",
+    "value": "{\n    \"mermaid\": \"graph LR\\n    トップページ-->システムエラー画面\\n    トップページ-->セッションエラー画面\\n    トップページ-->ログイン画面\\n    ログイン画面-->パスワードエラー画面\\n    システムエラー画面-->トップページ\\n    セッションエラー画面-->トップページ\\n    パスワードエラー画面-->ログイン画面\\n    ログイン画面-->管理者メニュー\\n    管理者メニュー-->ログ一覧画面\\n    ログ一覧画面-->ログ詳細画面\\n    ログ一覧画面-->ログ検索画面\\n    ログ検索画面-->ログ一覧画面\\n    ログ詳細画面-->ログ一覧画面\"\n}"
+  }
+]

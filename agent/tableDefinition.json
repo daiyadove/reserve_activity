@@ -1,0 +1,212 @@
+[
+  {
+    "id": "TAB-001",
+    "table": "customers",
+    "column": "customer_id",
+    "dataType": "UUID",
+    "regulation": "PRIMARY KEY",
+    "defaultValue": "uuid_generate_v4()",
+    "foreignKey": null,
+    "description": "顧客ID"
+  },
+  {
+    "id": "TAB-002",
+    "table": "customers",
+    "column": "name",
+    "dataType": "TEXT",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "顧客氏名"
+  },
+  {
+    "id": "TAB-003",
+    "table": "customers",
+    "column": "email",
+    "dataType": "TEXT",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "顧客メールアドレス"
+  },
+  {
+    "id": "TAB-004",
+    "table": "customers",
+    "column": "phone_number",
+    "dataType": "TEXT",
+    "regulation": null,
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "顧客電話番号"
+  },
+  {
+    "id": "TAB-005",
+    "table": "slots",
+    "column": "slot_id",
+    "dataType": "UUID",
+    "regulation": "PRIMARY KEY",
+    "defaultValue": "uuid_generate_v4()",
+    "foreignKey": null,
+    "description": "予約枠ID"
+  },
+  {
+    "id": "TAB-006",
+    "table": "slots",
+    "column": "start_time",
+    "dataType": "TIMESTAMP WITH TIME ZONE",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "予約枠開始日時"
+  },
+  {
+    "id": "TAB-007",
+    "table": "slots",
+    "column": "end_time",
+    "dataType": "TIMESTAMP WITH TIME ZONE",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "予約枠終了日時"
+  },
+  {
+    "id": "TAB-008",
+    "table": "slots",
+    "column": "capacity",
+    "dataType": "INTEGER",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "予約枠上限人数"
+  },
+  {
+    "id": "TAB-009",
+    "table": "slots",
+    "column": "is_sold_out",
+    "dataType": "BOOLEAN",
+    "regulation": "NOT NULL",
+    "defaultValue": "false",
+    "foreignKey": null,
+    "description": "売止フラグ"
+  },
+  {
+    "id": "TAB-010",
+    "table": "reservations",
+    "column": "reservation_id",
+    "dataType": "UUID",
+    "regulation": "PRIMARY KEY",
+    "defaultValue": "uuid_generate_v4()",
+    "foreignKey": null,
+    "description": "予約ID"
+  },
+  {
+    "id": "TAB-011",
+    "table": "reservations",
+    "column": "customer_id",
+    "dataType": "UUID",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": "customers(customer_id)",
+    "description": "顧客ID(外部キー)"
+  },
+  {
+    "id": "TAB-012",
+    "table": "reservations",
+    "column": "slot_id",
+    "dataType": "UUID",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": "slots(slot_id)",
+    "description": "予約枠ID(外部キー)"
+  },
+  {
+    "id": "TAB-013",
+    "table": "reservations",
+    "column": "number_of_people",
+    "dataType": "INTEGER",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "予約人数"
+  },
+  {
+    "id": "TAB-014",
+    "table": "reservations",
+    "column": "reservation_date",
+    "dataType": "TIMESTAMP WITH TIME ZONE",
+    "regulation": "NOT NULL",
+    "defaultValue": "now()",
+    "foreignKey": null,
+    "description": "予約登録日時"
+  },
+  {
+    "id": "TAB-015",
+    "table": "sold_out_settings",
+    "column": "sold_out_id",
+    "dataType": "UUID",
+    "regulation": "PRIMARY KEY",
+    "defaultValue": "uuid_generate_v4()",
+    "foreignKey": null,
+    "description": "売止設定ID"
+  },
+  {
+    "id": "TAB-016",
+    "table": "sold_out_settings",
+    "column": "slot_id",
+    "dataType": "UUID",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": "slots(slot_id)",
+    "description": "予約枠ID(外部キー)"
+  },
+  {
+    "id": "TAB-017",
+    "table": "sold_out_settings",
+    "column": "sold_out_date",
+    "dataType": "DATE",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "売止設定日付"
+  },
+  {
+    "id": "TAB-018",
+    "table": "system_logs",
+    "column": "log_id",
+    "dataType": "UUID",
+    "regulation": "PRIMARY KEY",
+    "defaultValue": "uuid_generate_v4()",
+    "foreignKey": null,
+    "description": "ログID"
+  },
+  {
+    "id": "TAB-019",
+    "table": "system_logs",
+    "column": "log_level",
+    "dataType": "TEXT",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "ログレベル"
+  },
+  {
+    "id": "TAB-020",
+    "table": "system_logs",
+    "column": "log_message",
+    "dataType": "TEXT",
+    "regulation": "NOT NULL",
+    "defaultValue": null,
+    "foreignKey": null,
+    "description": "ログメッセージ"
+  },
+  {
+    "id": "TAB-021",
+    "table": "system_logs",
+    "column": "log_time",
+    "dataType": "TIMESTAMP WITH TIME ZONE",
+    "regulation": "NOT NULL",
+    "defaultValue": "now()",
+    "foreignKey": null,
+    "description": "ログ出力時間"
+  }
+]
