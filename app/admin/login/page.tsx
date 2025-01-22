@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import type { Database } from "@/lib/supabase"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -29,7 +30,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = createClientComponentClient()
+  const supabase = createClientComponentClient<Database>()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,8 +53,8 @@ export default function LoginPage() {
         throw signInError
       }
 
-      router.push("/admin")
       router.refresh()
+      router.push("/admin")
     } catch (error) {
       let message = "メールアドレスまたはパスワードが正しくありません"
       if (error instanceof AuthError) {
@@ -79,10 +80,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">予約管理システム</h1>
+        <p className="text-gray-600 mt-2">管理者用ログイン</p>
+      </div>
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl text-center">管理者ログイン</CardTitle>
+          <CardTitle className="text-center">ログイン</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -97,6 +102,7 @@ export default function LoginPage() {
                       <Input 
                         type="email" 
                         autoComplete="username"
+                        placeholder="admin@example.com"
                         {...field} 
                       />
                     </FormControl>
@@ -114,6 +120,7 @@ export default function LoginPage() {
                       <Input 
                         type="password" 
                         autoComplete="current-password"
+                        placeholder="••••••••"
                         {...field} 
                       />
                     </FormControl>

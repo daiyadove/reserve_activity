@@ -7,8 +7,9 @@ import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { ReservationForm } from "@/components/reservation-form"
-import { TimeSlot, DailyTimeSlot } from "@/types/reservation"
-import { supabase } from "@/lib/supabase"
+import { DailyTimeSlot } from "@/types/reservation"
+import { createClientSupabaseClient } from "@/lib/supabase"
+
 import { useToast } from "@/hooks/use-toast"
 
 export default function HomePage() {
@@ -22,6 +23,8 @@ export default function HomePage() {
   const fetchDailySlots = async (date: Date) => {
     try {
       setIsLoading(true)
+      
+      const supabase = createClientSupabaseClient()
       
       // 時間枠を取得
       const { data: timeSlots, error: timeSlotsError } = await supabase
@@ -54,16 +57,16 @@ export default function HomePage() {
       }
 
       // 予約枠ごとの予約人数を集計
-      const reservationCounts = reservations?.reduce((acc, curr) => {
+      const reservationCounts = reservations?.reduce((acc: Record<string, number>, curr: { slot_id: string; number_of_people: number }) => {
         acc[curr.slot_id] = (acc[curr.slot_id] || 0) + curr.number_of_people
         return acc
       }, {} as Record<string, number>) || {}
 
       // 売止設定のslot_idセットを作成
-      const soldOutSlotIds = new Set(soldOutSettings?.map(s => s.slot_id) || [])
+      const soldOutSlotIds = new Set(soldOutSettings?.map((s: { slot_id: string }) => s.slot_id) || [])
 
       // 日付と時間枠を組み合わせた情報を作成
-      const dailyTimeSlots = timeSlots?.map(slot => ({
+      const dailyTimeSlots = timeSlots?.map((slot: { slot_id: string; capacity: number; start_time: string; end_time: string }) => ({
         ...slot,
         date: format(date, "yyyy-MM-dd"),
         is_sold_out: soldOutSlotIds.has(slot.slot_id),
@@ -88,7 +91,7 @@ export default function HomePage() {
     if (selectedDate) {
       fetchDailySlots(selectedDate)
     }
-  }, [selectedDate])
+  }, [selectedDate, toast])
 
   // 日付が選択された時の処理
   const handleDateSelect = (date: Date | undefined) => {

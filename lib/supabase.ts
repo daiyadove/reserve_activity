@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -7,17 +8,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
-
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
-
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       customers: {
@@ -135,3 +126,18 @@ export interface Database {
     }
   }
 }
+
+// クライアントコンポーネント用のクライアント
+export const createClientSupabaseClient = () =>
+  createClientComponentClient<Database>()
+
+// 従来のクライアント（必要な場合のみ使用）
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
