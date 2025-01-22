@@ -12,6 +12,7 @@ DROP POLICY IF EXISTS "Enable update for authenticated users" ON sold_out_settin
 DROP POLICY IF EXISTS "Enable delete for authenticated users" ON sold_out_settings;
 DROP POLICY IF EXISTS "Enable read access for authenticated users" ON system_logs;
 DROP POLICY IF EXISTS "Enable insert access for authenticated users" ON system_logs;
+DROP POLICY IF EXISTS "Enable read access for all users" ON menu_items;
 
 -- Drop existing tables
 DROP TABLE IF EXISTS system_logs;
@@ -19,12 +20,23 @@ DROP TABLE IF EXISTS reservations;
 DROP TABLE IF EXISTS sold_out_settings;
 DROP TABLE IF EXISTS time_slots;
 DROP TABLE IF EXISTS customers;
+DROP TABLE IF EXISTS menu_items;
 
 -- Enable UUID generation
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Enable full text search
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Menu items table
+CREATE TABLE IF NOT EXISTS menu_items (
+    menu_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    description TEXT,
+    duration INTEGER NOT NULL, -- 分単位での所要時間
+    price INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
 
 -- Customers table
 CREATE TABLE IF NOT EXISTS customers (
@@ -64,6 +76,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     customer_id UUID NOT NULL REFERENCES customers(customer_id) ON DELETE CASCADE,
     slot_id UUID NOT NULL REFERENCES time_slots(slot_id) ON DELETE CASCADE,
+    menu_id UUID NOT NULL REFERENCES menu_items(menu_id) ON DELETE CASCADE,
     reservation_date DATE NOT NULL,
     number_of_people INTEGER NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -73,6 +86,7 @@ CREATE TABLE IF NOT EXISTS reservations (
 CREATE INDEX IF NOT EXISTS reservations_customer_id_idx ON reservations (customer_id);
 CREATE INDEX IF NOT EXISTS reservations_slot_id_idx ON reservations (slot_id);
 CREATE INDEX IF NOT EXISTS reservations_date_idx ON reservations (reservation_date);
+CREATE INDEX IF NOT EXISTS reservations_menu_id_idx ON reservations (menu_id);
 
 -- System logs table
 CREATE TABLE IF NOT EXISTS system_logs (
@@ -86,11 +100,15 @@ CREATE TABLE IF NOT EXISTS system_logs (
 CREATE INDEX IF NOT EXISTS system_logs_time_idx ON system_logs (log_time);
 
 -- Enable Row Level Security (RLS)
+ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE time_slots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sold_out_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_logs ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for menu_items
+CREATE POLICY "Enable read access for all users" ON menu_items FOR SELECT USING (true);
 
 -- Create policies for customers
 CREATE POLICY "Enable read access for all users" ON customers FOR SELECT USING (true);

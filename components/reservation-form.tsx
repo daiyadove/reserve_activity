@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -17,9 +17,16 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { DailyTimeSlot } from "@/types/reservation"
-import { supabase } from "@/lib/supabase"
+import { DailyTimeSlot, MenuItem } from "@/types/reservation"
+import { createClientSupabaseClient } from "@/lib/supabase"
 
 const formSchema = z.object({
   name: z.string().min(1, "名前を入力してください"),
@@ -28,6 +35,7 @@ const formSchema = z.object({
   number_of_people: z.number()
     .min(1, "1人以上を選択してください")
     .max(10, "10人以下を選択してください"),
+  menu_id: z.string().min(1, "メニューを選択してください"),
 })
 
 interface ReservationFormProps {
@@ -36,9 +44,33 @@ interface ReservationFormProps {
   onCancel: () => void
 }
 
-export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormProps) {
+export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormProps): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false)
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([])
   const { toast } = useToast()
+  const supabase = createClientSupabaseClient()
+
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      const { data, error } = await supabase
+        .from("menu_items")
+        .select("*")
+        .order("price")
+
+      if (error) {
+        toast({
+          title: "エラーが発生しました",
+          description: "メニューの取得に失敗しました",
+          variant: "destructive",
+        })
+        return
+      }
+
+      setMenuItems(data)
+    }
+
+    fetchMenuItems()
+  }, [toast])
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,6 +79,7 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
       email: "",
       phone_number: "",
       number_of_people: 1,
+      menu_id: "",
     },
   })
 
@@ -75,6 +108,7 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
         .insert({
           customer_id: customerData.customer_id,
           slot_id: slot.slot_id,
+          menu_id: values.menu_id,
           reservation_date: slot.date,
           number_of_people: values.number_of_people,
         })
@@ -83,9 +117,12 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
         throw new Error("予約情報の保存に失敗しました")
       }
 
+      // 選択されたメニューの情報を取得
+      const selectedMenu = menuItems.find(menu => menu.menu_id === values.menu_id)
+
       toast({
         title: "予約が完了しました",
-        description: `${format(new Date(slot.date), "M月d日", { locale: ja })} ${format(new Date(`2000-01-01T${slot.start_time}`), "H:mm", { locale: ja })}からの予約を受け付けました。`,
+        description: `${format(new Date(slot.date), "M月d日", { locale: ja })} ${format(new Date(`2000-01-01T${slot.start_time}`), "H:mm", { locale: ja })}から${selectedMenu?.name}の予約を受け付けました。`,
       })
 
       onSuccess()
@@ -104,6 +141,35 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="menu_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>メニュー</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="メニューを選択してください" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {menuItems.map((menu) => (
+                    <SelectItem key={menu.menu_id} value={menu.menu_id}>
+                      {menu.name} ({menu.duration}分) - ¥{menu.price.toLocaleString()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {field.value && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  {menuItems.find(menu => menu.menu_id === field.value)?.description}
+                </p>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="name"

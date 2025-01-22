@@ -5,6 +5,14 @@ export interface TimeSlot {
   capacity: number
 }
 
+export interface MenuItem {
+  menu_id: string
+  name: string
+  description: string
+  duration: number
+  price: number
+}
+
 export interface Customer {
   customer_id: string
   name: string
@@ -16,10 +24,12 @@ export interface Reservation {
   reservation_id: string
   customer_id: string
   slot_id: string
+  menu_id: string
   reservation_date: string
   number_of_people: number
   customers?: Customer
   time_slot?: TimeSlot
+  menu_item?: MenuItem
 }
 
 export interface ReservationFormData {
@@ -27,6 +37,7 @@ export interface ReservationFormData {
   email: string
   phone_number: string
   number_of_people: number
+  menu_id: string
 }
 
 export interface SoldOutSetting {
