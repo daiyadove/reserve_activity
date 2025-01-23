@@ -27,6 +27,7 @@ import {
 import { useToast } from "@/hooks/use-toast"
 import { DailyTimeSlot, MenuItem } from "@/types/reservation"
 import { createClientSupabaseClient } from "@/lib/supabase"
+import { PaymentForm } from "@/components/payment-form"
 
 const formSchema = z.object({
   name: z.string().min(1, "名前を入力してください"),
@@ -47,6 +48,8 @@ interface ReservationFormProps {
 export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormProps): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false)
   const [menuItems, setMenuItems] = useState<MenuItem[]>([])
+  const [showPayment, setShowPayment] = useState(false)
+  const [formData, setFormData] = useState<z.infer<typeof formSchema> | null>(null)
   const { toast } = useToast()
   const supabase = createClientSupabaseClient()
 
@@ -84,16 +87,23 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setFormData(values)
+    setShowPayment(true)
+  }
+
+  async function handlePaymentSuccess() {
     try {
       setIsLoading(true)
+
+      if (!formData) return
 
       // 顧客情報を保存
       const { data: customerData, error: customerError } = await supabase
         .from("customers")
         .insert({
-          name: values.name,
-          email: values.email,
-          phone_number: values.phone_number,
+          name: formData.name,
+          email: formData.email,
+          phone_number: formData.phone_number,
         })
         .select()
         .single()
@@ -108,9 +118,9 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
         .insert({
           customer_id: customerData.customer_id,
           slot_id: slot.slot_id,
-          menu_id: values.menu_id,
+          menu_id: formData.menu_id,
           reservation_date: slot.date,
-          number_of_people: values.number_of_people,
+          number_of_people: formData.number_of_people,
         })
 
       if (reservationError) {
@@ -118,7 +128,7 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
       }
 
       // 選択されたメニューの情報を取得
-      const selectedMenu = menuItems.find(menu => menu.menu_id === values.menu_id)
+      const selectedMenu = menuItems.find(menu => menu.menu_id === formData.menu_id)
 
       toast({
         title: "予約が完了しました",
@@ -136,6 +146,46 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
     } finally {
       setIsLoading(false)
     }
+  }
+
+  function handlePaymentError(error: string) {
+    toast({
+      title: "支払いエラー",
+      description: error,
+      variant: "destructive",
+    })
+  }
+
+  if (showPayment && formData) {
+    const selectedMenu = menuItems.find(menu => menu.menu_id === formData.menu_id)
+    if (!selectedMenu) return (
+      <div className="text-destructive">メニューの情報が見つかりません</div>
+    )
+
+    return (
+      <div className="space-y-4">
+        <div className="text-sm space-y-2">
+          <p><strong>メニュー:</strong> {selectedMenu.name}</p>
+          <p><strong>金額:</strong> ¥{selectedMenu.price.toLocaleString()}</p>
+          <p><strong>予約者:</strong> {formData.name}</p>
+          <p><strong>人数:</strong> {formData.number_of_people}名</p>
+        </div>
+        <PaymentForm
+          amount={selectedMenu.price * formData.number_of_people}
+          menuName={selectedMenu.name}
+          onSuccess={handlePaymentSuccess}
+          onError={handlePaymentError}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShowPayment(false)}
+          className="w-full"
+        >
+          戻る
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -233,7 +283,7 @@ export function ReservationForm({ slot, onSuccess, onCancel }: ReservationFormPr
             キャンセル
           </Button>
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "予約中..." : "予約する"}
+            {isLoading ? "処理中..." : "次へ"}
           </Button>
         </div>
       </form>
