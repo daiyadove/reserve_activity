@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS menu_items (
     description TEXT,
     duration INTEGER NOT NULL, -- 分単位での所要時間
     price INTEGER NOT NULL,
+    image_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -132,3 +133,43 @@ CREATE POLICY "Enable delete for authenticated users" ON sold_out_settings FOR D
 -- Create policies for system_logs
 CREATE POLICY "Enable read access for authenticated users" ON system_logs FOR SELECT USING (auth.role() = 'authenticated');
 CREATE POLICY "Enable insert access for authenticated users" ON system_logs FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- Drop existing tables
+DROP TABLE IF EXISTS coupon_usages;
+DROP TABLE IF EXISTS coupons;
+
+-- Coupons table
+CREATE TABLE IF NOT EXISTS coupons (
+    coupon_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    code TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    discount_amount INTEGER NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    created_by UUID REFERENCES auth.users(id)
+);
+
+-- Coupon usages table
+CREATE TABLE IF NOT EXISTS coupon_usages (
+    usage_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    coupon_id UUID NOT NULL REFERENCES coupons(coupon_id),
+    reservation_id UUID NOT NULL REFERENCES reservations(reservation_id),
+    used_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Create indexes
+CREATE INDEX IF NOT EXISTS coupons_code_idx ON coupons (code);
+CREATE INDEX IF NOT EXISTS coupon_usages_coupon_id_idx ON coupon_usages (coupon_id);
+CREATE INDEX IF NOT EXISTS coupon_usages_reservation_id_idx ON coupon_usages (reservation_id);
+
+-- Enable RLS
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+ALTER TABLE coupon_usages ENABLE ROW LEVEL SECURITY;
+
+-- Create policies for coupons
+CREATE POLICY "Enable read access for all users" ON coupons FOR SELECT USING (true);
+CREATE POLICY "Enable all access for authenticated users" ON coupons FOR ALL USING (auth.role() = 'authenticated');
+
+-- Create policies for coupon_usages
+CREATE POLICY "Enable read access for authenticated users" ON coupon_usages FOR SELECT USING (auth.role() = 'authenticated');
+CREATE POLICY "Enable insert access for all users" ON coupon_usages FOR INSERT WITH CHECK (true);

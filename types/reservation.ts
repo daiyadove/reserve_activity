@@ -11,6 +11,7 @@ export interface MenuItem {
   description: string
   duration: number
   price: number
+  image_url: string | null
 }
 
 export interface Customer {
@@ -51,4 +52,26 @@ export interface DailyTimeSlot extends TimeSlot {
   is_sold_out: boolean
   available_capacity: number
   date: string
+}
+
+export interface Coupon {
+  coupon_id: string
+  code: string
+  name: string
+  discount_amount: number
+  is_active: boolean
+  created_at: string
+  created_by?: string
+}
+
+export interface CouponUsage {
+  usage_id: string
+  coupon_id: string
+  reservation_id: string
+  used_at: string
+  coupon?: Coupon
+}
+
+export interface ReservationWithCoupon extends Reservation {
+  coupon_usage?: CouponUsage
 }

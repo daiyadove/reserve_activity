@@ -44,6 +44,17 @@ export function AdminNav() {
       >
         予約一覧
       </Link>
+      <Link
+        href="/admin/coupons"
+        className={cn(
+          "text-sm font-medium transition-colors hover:text-primary",
+          pathname === "/admin/coupons"
+            ? "text-primary"
+            : "text-muted-foreground"
+        )}
+      >
+        クーポン管理
+      </Link>
       <Link href="/" className="ml-auto">
         <Button variant="outline">
           サイトを表示
