@@ -58,7 +58,7 @@ export interface Coupon {
   coupon_id: string
   code: string
   name: string
-  discount_amount: number
+  discount_percentage: number
   is_active: boolean
   created_at: string
   created_by?: string

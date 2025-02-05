@@ -24,9 +24,9 @@ const formSchema = z.object({
     .max(20, "コードは20文字以下で入力してください")
     .regex(/^[A-Za-z0-9]+$/, "英数字のみ使用できます"),
   name: z.string().min(1, "名前を入力してください"),
-  discount_amount: z.number()
-    .min(1, "1円以上を入力してください")
-    .max(10000, "10,000円以下を入力してください"),
+  discount_percentage: z.number()
+    .min(1, "1%以上を入力してください")
+    .max(100, "100%以下を入力してください"),
 })
 
 interface CouponFormProps {
@@ -44,7 +44,7 @@ export function CouponForm({ onSuccess, onCancel }: CouponFormProps): React.Reac
     defaultValues: {
       code: "",
       name: "",
-      discount_amount: 500,
+      discount_percentage: 10,
     },
   })
 
@@ -77,7 +77,7 @@ export function CouponForm({ onSuccess, onCancel }: CouponFormProps): React.Reac
         .insert({
           code: values.code.toUpperCase(),
           name: values.name,
-          discount_amount: values.discount_amount,
+          discount_percentage: values.discount_percentage,
         })
 
       if (createError) {
@@ -137,15 +137,15 @@ export function CouponForm({ onSuccess, onCancel }: CouponFormProps): React.Reac
         />
         <FormField
           control={form.control}
-          name="discount_amount"
+          name="discount_percentage"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>割引額（円）</FormLabel>
+              <FormLabel>割引率（%）</FormLabel>
               <FormControl>
                 <Input
                   type="number"
                   min={1}
-                  max={10000}
+                  max={100}
                   {...field}
                   onChange={(e) => field.onChange(parseInt(e.target.value))}
                 />

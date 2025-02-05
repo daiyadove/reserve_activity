@@ -130,7 +130,7 @@ export default function CouponsPage() {
             <TableRow>
               <TableHead>コード</TableHead>
               <TableHead>名前</TableHead>
-              <TableHead>割引額</TableHead>
+              <TableHead>割引率</TableHead>
               <TableHead>使用回数</TableHead>
               <TableHead>状態</TableHead>
               <TableHead>作成日時</TableHead>
@@ -155,7 +155,7 @@ export default function CouponsPage() {
                 <TableRow key={coupon.coupon_id}>
                   <TableCell className="font-mono">{coupon.code}</TableCell>
                   <TableCell>{coupon.name}</TableCell>
-                  <TableCell>¥{coupon.discount_amount.toLocaleString()}</TableCell>
+                  <TableCell>{coupon.discount_percentage}%</TableCell>
                   <TableCell>{coupon.usage_count}回</TableCell>
                   <TableCell>
                     <span

@@ -1,0 +1,51 @@
+あなたはNextjsのスペシャリスト
+
+# ディレクトリ構成
+
+```
+reserve_activity/
+├── app/                      # Next.js 13のApp Router
+│   ├── api/                  # APIルート
+│   ├── admin/               # 管理者ページ
+│   ├── payment/             # 決済ページ
+│   ├── reservation-complete/ # 予約完了ページ
+│   ├── page.tsx             # トップページ
+│   ├── layout.tsx           # ルートレイアウト
+│   └── globals.css          # グローバルスタイル
+├── components/              # 共通コンポーネント
+├── hooks/                   # カスタムフック
+├── lib/                     # ユーティリティ関数
+├── public/                  # 静的ファイル
+├── supabase/               # Supabase関連
+│   ├── schema.sql          # データベーススキーマ
+│   └── seed.sql            # シードデータ
+├── types/                   # 型定義
+├── middleware.ts           # Next.jsミドルウェア
+├── next.config.ts         # Next.js設定
+└── tailwind.config.ts     # Tailwind CSS設定
+```
+
+# 主要なファイル構成の説明
+
+- `app/`: Next.js 13のApp Routerを使用したページ構成
+  - `api/`: サーバーサイドAPIエンドポイント
+  - `admin/`: 管理者向け機能（クーポン管理など）
+  - `payment/`: Stripe決済処理
+  - `reservation-complete/`: 予約完了画面
+
+- `components/`: 再利用可能なReactコンポーネント
+  - `reservation-form.tsx`: 予約フォーム
+  - `payment-form.tsx`: 決済フォーム
+  - `menu-selection.tsx`: メニュー選択
+  - `coupon-form.tsx`: クーポン入力フォーム
+
+- `hooks/`: カスタムReactフック
+  - `use-stripe-payment.ts`: Stripe決済処理
+  - `use-toast.ts`: トースト通知
+
+- `lib/`: ユーティリティ関数とサービス
+  - `supabase.ts`: Supabaseクライアント
+
+- `types/`: TypeScript型定義
+  - `reservation.ts`: 予約関連の型定義
+

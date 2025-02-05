@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { format } from "date-fns"
 import { ja } from "date-fns/locale"
+import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -41,12 +42,12 @@ interface ReservationFormProps {
 
 export function ReservationForm({ slot, menu, onSuccess, onCancel }: ReservationFormProps): React.ReactElement {
   const [isLoading, setIsLoading] = useState(false)
-  const [showPayment, setShowPayment] = useState(false)
   const [formData, setFormData] = useState<z.infer<typeof formSchema> | null>(null)
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null)
   const [isClient, setIsClient] = useState(false)
   const { toast } = useToast()
   const supabase = createClientSupabaseClient()
+  const router = useRouter()
 
   // クライアントサイドでの初期化
   useEffect(() => {
@@ -93,7 +94,7 @@ export function ReservationForm({ slot, menu, onSuccess, onCancel }: Reservation
       setAppliedCoupon(data)
       toast({
         title: "クーポンを適用しました",
-        description: `${data.name}（${data.discount_amount}円引き/人）`,
+        description: `${data.name}（${data.discount_percentage}%OFF）`,
       })
     } catch (error) {
       const message = error instanceof Error ? error.message : "エラーが発生しました"
@@ -117,23 +118,24 @@ export function ReservationForm({ slot, menu, onSuccess, onCancel }: Reservation
   })
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    setFormData(values)
-    setShowPayment(true)
-  }
-
-  async function handlePaymentSuccess() {
     try {
       setIsLoading(true)
+      setFormData(values)
 
-      if (!formData) return
+      // 割引後の金額を計算
+      const baseAmount = menu.price * values.number_of_people
+      const discountAmount = appliedCoupon 
+        ? Math.floor(baseAmount * (appliedCoupon.discount_percentage / 100))
+        : 0
+      const finalAmount = Math.max(baseAmount - discountAmount, 0)
 
       // 顧客情報を保存
       const { data: customerData, error: customerError } = await supabase
         .from("customers")
         .insert({
-          name: formData.name,
-          email: formData.email,
-          phone_number: formData.phone_number,
+          name: values.name,
+          email: values.email,
+          phone_number: values.phone_number,
         })
         .select()
         .single()
@@ -142,99 +144,31 @@ export function ReservationForm({ slot, menu, onSuccess, onCancel }: Reservation
         throw new Error("顧客情報の保存に失敗しました")
       }
 
-      // 予約情報を保存
-      const { data: reservationData, error: reservationError } = await supabase
-        .from("reservations")
-        .insert({
-          customer_id: customerData.customer_id,
-          slot_id: slot.slot_id,
-          menu_id: menu.menu_id,
-          reservation_date: slot.date,
-          number_of_people: formData.number_of_people,
-        })
-        .select()
-        .single()
-
-      if (reservationError) {
-        throw new Error("予約情報の保存に失敗しました")
-      }
-
-      // クーポンが適用されている場合、使用履歴を保存
-      if (appliedCoupon) {
-        const { error: couponError } = await supabase
-          .from("coupon_usages")
-          .insert({
-            coupon_id: appliedCoupon.coupon_id,
-            reservation_id: reservationData.reservation_id,
-          })
-
-        if (couponError) {
-          throw new Error("クーポン使用履歴の保存に失敗しました")
-        }
-      }
-
-      toast({
-        title: "予約が完了しました",
-        description: `${format(new Date(slot.date), "M月d日", { locale: ja })} ${format(new Date(`2000-01-01T${slot.start_time}`), "H:mm", { locale: ja })}から${menu.name}の予約を受け付けました。`,
+      // 支払いページへリダイレクト
+      const searchParams = new URLSearchParams({
+        menuName: menu.name,
+        baseAmount: baseAmount.toString(),
+        discountAmount: discountAmount.toString(),
+        finalAmount: finalAmount.toString(),
+        numberOfPeople: values.number_of_people.toString(),
+        customerName: values.name,
+        customerId: customerData.customer_id,
+        slotId: slot.slot_id,
+        menuId: menu.menu_id,
+        reservationDate: slot.date,
+        couponId: appliedCoupon?.coupon_id || "",
       })
 
-      onSuccess()
+      router.push(`/payment?${searchParams.toString()}`)
     } catch (error) {
-      const message = error instanceof Error ? error.message : "予約に失敗しました"
+      const message = error instanceof Error ? error.message : "エラーが発生しました"
       toast({
-        title: "エラーが発生しました",
+        title: "エラー",
         description: message,
         variant: "destructive",
       })
-    } finally {
       setIsLoading(false)
     }
-  }
-
-  function handlePaymentError(error: string) {
-    toast({
-      title: "支払いエラー",
-      description: error,
-      variant: "destructive",
-    })
-  }
-
-  if (showPayment && formData) {
-    // 割引後の金額を計算
-    const baseAmount = menu.price * formData.number_of_people
-    const discountAmount = appliedCoupon ? appliedCoupon.discount_amount * formData.number_of_people : 0
-    const finalAmount = Math.max(baseAmount - discountAmount, 0)
-
-    return (
-      <div className="space-y-4">
-        <div className="text-sm space-y-2">
-          <p><strong>メニュー:</strong> {menu.name}</p>
-          <p><strong>予約者:</strong> {formData.name}</p>
-          <p><strong>人数:</strong> {formData.number_of_people}名</p>
-          <p><strong>料金:</strong> ¥{baseAmount.toLocaleString()}</p>
-          {appliedCoupon && (
-            <p><strong>割引:</strong> -¥{discountAmount.toLocaleString()} ({appliedCoupon.name})</p>
-          )}
-          <p className="font-bold">
-            <strong>お支払い金額:</strong> ¥{finalAmount.toLocaleString()}
-          </p>
-        </div>
-        <PaymentForm
-          amount={finalAmount}
-          menuName={menu.name}
-          onSuccess={handlePaymentSuccess}
-          onError={handlePaymentError}
-        />
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowPayment(false)}
-          className="w-full"
-        >
-          戻る
-        </Button>
-      </div>
-    )
   }
 
   // 初期レンダリング時は空のdivを返す
@@ -339,7 +273,7 @@ export function ReservationForm({ slot, menu, onSuccess, onCancel }: Reservation
               </FormControl>
               {appliedCoupon && (
                 <p className="text-sm text-green-600">
-                  {appliedCoupon.name}（{appliedCoupon.discount_amount.toLocaleString()}円引き/人）
+                  {appliedCoupon.name}（{appliedCoupon.discount_percentage}%OFF）
                 </p>
               )}
               <FormMessage />
